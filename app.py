@@ -17,10 +17,19 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Encabezado con Logo
-st.image("logo gp final al agua.jpg", width=150)
-st.title("Generador de Videos Cinematográficos")
-st.write("---")
+# --- Encabezado Seguro ---
+col1, col2 = st.columns([1, 4])
+with col1:
+    try:
+        # Intentamos cargar el logo con el nombre exacto
+        st.image("logo gp final al agua.jpg", width=120)
+    except:
+        # Si falla, mostramos un icono elegante para que no dé error la página
+        st.markdown("### 🏆")
+
+with col2:
+    st.title("Generador Pro GP")
+    st.write("Estrategia y Contenido de Alto Impacto")
 
 # --- Inteligencia de Contenido ---
 tema = st.text_input("🎯 ¿Cuál es el tema de investigación hoy?", placeholder="Ej: Pasos para ahorrar mi primer millón")
