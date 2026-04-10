@@ -3,9 +3,9 @@ import google.generativeai as genai
 import time
 
 # --- CONFIGURACIÓN DE IDENTIDAD ---
-st.set_page_config(page_title="Ecosistema GP | Presentación Animada", layout="centered")
+st.set_page_config(page_title="Folioscopio Digital | Grandes Protagonistas", layout="centered")
 
-# Estilo para el Formato Vertical (Reel Style)
+# Estilo para el Carrusel/Folioscopio
 st.markdown("""
     <style>
     .main { background-color: #ffffff; }
@@ -13,72 +13,95 @@ st.markdown("""
         width: 100%; border-radius: 12px; height: 3.5em;
         background-color: #4a4a4a; color: white; border: none; font-weight: bold;
     }
-    /* Estilo del Contenedor Vertical */
-    .vertical-reel {
-        width: 320px; height: 568px; 
-        background: linear-gradient(180deg, #f0f0f0 0%, #dcdcdc 100%);
-        border: 8px solid #333; border-radius: 25px;
-        margin: auto; position: relative; overflow: hidden;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        text-align: center; padding: 20px; box-shadow: 0px 10px 30px rgba(0,0,0,0.1);
+    .folio-page {
+        width: 100%; height: 450px;
+        background-color: #f9f9f9;
+        border: 2px solid #e0e0e0;
+        border-radius: 20px;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        padding: 30px; text-align: center;
+        box-shadow: 0px 4px 15px rgba(0,0,0,0.05);
     }
-    .reel-text { color: #333; font-family: 'Helvetica Neue', sans-serif; font-weight: bold; font-size: 22px; }
-    .reel-logo { position: absolute; top: 20px; width: 50px; opacity: 0.6; }
+    .folio-text { font-size: 24px; color: #333; font-weight: 600; margin-top: 20px; }
+    .folio-header { color: #9c9c9c; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
     </style>
     """, unsafe_allow_html=True)
 
 # Encabezado
-st.title("Generador de Contenido Vertical")
-st.write("Estrategia Visual Grandes Protagonistas")
+st.title("📖 Folioscopio Estratégico GP")
+st.write("Contenido Visual en Secuencia | Método CEO")
 
 # --- CONEXIÓN IA ---
 GOOGLE_API_KEY = "AIzaSyDwwARFP76pMG6VEEiMkKXUPlQLIvXpWds"
 genai.configure(api_key=GOOGLE_API_KEY)
 MODELO_GP = "gemini-2.5-flash"
 
-# --- ENTRADA DE DATOS ---
-tema = st.text_input("🎯 Tema para tu Reel/TikTok:", placeholder="Ej: 3 errores que matan tus ahorros")
+# --- ÁREA DE TRABAJO ---
+tema = st.text_input("🎯 ¿Sobre qué creamos el folioscopio hoy?", placeholder="Ej: Los 5 pilares del ahorro")
+modo = st.radio("Selecciona el formato visual:", ["Carrusel Manual", "Folioscopio Automático"])
 
-if st.button("🚀 CREAR PRESENTACIÓN ANIMADA"):
+if st.button("🚀 GENERAR SECUENCIA VISUAL"):
     if tema:
-        with st.status("🧠 La IA está diseñando la secuencia...", expanded=True) as status:
+        with st.status("🧠 La IA está ilustrando tu estrategia...", expanded=True) as status:
             try:
                 model = genai.GenerativeModel(MODELO_GP)
-                # Pedimos a la IA que divida el guion en "escenas" cortas
-                prompt = f"Actúa como experto en redes sociales. Crea 5 frases cortas y potentes sobre '{tema}' para un Reel de 15 segundos. Usa el Método CEO. Devuélveme solo las 5 frases separadas por comas."
-                
+                # Pedimos a la IA que cree 5 "páginas" de folioscopio
+                prompt = f"""
+                Actúa como diseñador instruccional. Para el tema '{tema}', crea 5 páginas para un folioscopio.
+                Cada página debe tener:
+                1. Una frase corta y potente (Máximo 10 palabras).
+                2. Una palabra clave para buscar una imagen descriptiva.
+                Formato: Frase | PalabraClave
+                Dame solo las 5 líneas.
+                """
                 response = model.generate_content(prompt)
-                frases = response.text.split(',')
+                lineas = response.text.strip().split('\n')
                 
-                status.update(label="✅ Secuencia Diseñada", state="complete", expanded=False)
+                status.update(label="✅ Folioscopio Listo", state="complete", expanded=False)
 
-                # --- REPRODUCTOR ANIMADO (Simulación de Presentación) ---
-                st.subheader("🎥 Vista Previa Vertical")
+                # --- RENDERIZADO DEL FOLIOSCOPIO ---
+                st.subheader("🖼️ Resultado Visual")
                 
-                # Contenedor de la animación
-                reel_placeholder = st.empty()
+                paginas_contenido = []
+                for linea in lineas:
+                    if "|" in linea:
+                        partes = linea.split("|")
+                        texto = partes[0].strip()
+                        keyword = partes[1].strip()
+                        # Usamos Unsplash para obtener imágenes reales basadas en la IA
+                        img_url = f"https://source.unsplash.com/featured/?{keyword},finance,minimal"
+                        paginas_contenido.append({"texto": texto, "img": img_url})
+
+                if modo == "Carrusel Manual":
+                    # Carrusel usando pestañas de Streamlit
+                    tabs = st.tabs([f"Pág {i+1}" for i in range(len(paginas_contenido))])
+                    for i, tab in enumerate(tabs):
+                        with tab:
+                            st.markdown(f"""
+                                <div class="folio-page">
+                                    <div class="folio-header">Escena {i+1}</div>
+                                    <img src="{paginas_contenido[i]['img']}" style="width: 250px; border-radius: 15px; margin-bottom: 20px;">
+                                    <div class="folio-text">{paginas_contenido[i]['texto']}</div>
+                                </div>
+                            """, unsafe_allow_html=True)
                 
-                for frase in frases:
-                    # Creamos el efecto de "diapositiva"
-                    reel_placeholder.markdown(f"""
-                        <div class="vertical-reel">
-                            <div class="reel-logo">🏆</div>
-                            <div class="reel-text">{frase.strip()}</div>
-                            <div style="position: absolute; bottom: 30px; font-size: 12px; color: #888;">
-                                Grandes Protagonistas | Método CEO
+                else:
+                    # Folioscopio Automático (Efecto de paso de página)
+                    placeholder = st.empty()
+                    for i, pag in enumerate(paginas_contenido):
+                        placeholder.markdown(f"""
+                            <div class="folio-page">
+                                <div class="folio-header">Paso {i+1} de 5</div>
+                                <img src="{pag['img']}" style="width: 280px; border-radius: 15px; margin-bottom: 20px;">
+                                <div class="folio-text">{pag['texto']}</div>
                             </div>
-                        </div>
-                    """, unsafe_allow_html=True)
-                    time.sleep(3) # Tiempo que dura cada frase en pantalla
+                        """, unsafe_allow_html=True)
+                        time.sleep(3) # Velocidad del folioscopio
                 
-                st.success("🏁 Presentación completada. Puedes capturar pantalla para tus historias.")
-                
-                # --- GUION COMPLETO ---
-                st.divider()
-                st.subheader("📝 Guion Completo Detallado")
-                st.write(response.text)
+                st.success("🏁 Secuencia terminada. ¡Ideal para grabar como Reel!")
 
             except Exception as e:
-                st.error(f"Error: {str(e)}")
+                st.error(f"Error de cuota o conexión: Espera 60 segundos. Detalle: {e}")
     else:
-        st.error("Ingresa un tema.")
+        st.error("Por favor, ingresa un tema.")
