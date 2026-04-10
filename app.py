@@ -30,13 +30,13 @@ with col2:
 
 st.divider()
 
-# --- CONEXIÓN UNIVERSAL CON GOOGLE AI ---
+# --- CONEXIÓN ESTABLE CON GOOGLE AI ---
 GOOGLE_API_KEY = "AIzaSyBRs7BCWWohYqNki9zE_pyHlx0NntZTofI"
 
 try:
     genai.configure(api_key=GOOGLE_API_KEY)
-    # Usamos el nombre 'gemini-pro', que es el más estable y universalmente aceptado
-    model = genai.GenerativeModel('gemini-pro')
+    # Usamos el modelo 'gemini-1.5-flash' sin rutas de versiones beta
+    model = genai.GenerativeModel('gemini-1.5-flash')
     api_funcional = True
 except Exception as error_config:
     st.error(f"Error en la configuración: {error_config}")
@@ -49,14 +49,16 @@ estilo = st.selectbox("Estilo visual:", ["Profesional Ejecutivo", "Inspirador Mi
 if st.button("🚀 GENERAR CONTENIDO COMPLETO"):
     if tema and api_funcional:
         with st.status("🧠 La IA está trabajando...", expanded=True) as status:
-            st.write("Investigando fuentes seguras...")
+            st.write("Conectando con la base de datos de Google...")
             try:
-                # Prompt directo y potente
-                prompt = f"Actúa como un experto financiero de Grandes Protagonistas. Investiga sobre '{tema}' y redacta un guion de 3 minutos para video siguiendo el Método CEO. Incluye gancho, 3 puntos clave y cierre motivador."
+                # Prompt directo
+                prompt = f"Actúa como un experto financiero. Investiga sobre '{tema}' y redacta un guion de 3 minutos para video siguiendo el Método CEO de Grandes Protagonistas. Incluye gancho, 3 puntos clave y cierre motivador."
+                
+                # Generación directa
                 response = model.generate_content(prompt)
                 guion_final = response.text
                 
-                st.write("Preparando visuales integrados...")
+                st.write("Estructurando visuales...")
                 time.sleep(1)
                 status.update(label="✅ ¡Contenido Generado!", state="complete", expanded=False)
 
@@ -79,7 +81,7 @@ if st.button("🚀 GENERAR CONTENIDO COMPLETO"):
                 st.code(f"#GrandesProtagonistas #MetodoCEO #FinanzasParaguay #{tema.replace(' ', '')}")
 
             except Exception as e:
-                st.error(f"Hubo un problema con la respuesta de Google: {str(e)}")
-                st.info("Tip: Asegúrate de que tu API Key no tenga espacios adicionales al principio o al final.")
+                st.error(f"Error de conexión: {str(e)}")
+                st.info("Nota: Si el error persiste, es posible que la API Key necesite un minuto para propagarse en los servidores de Google.")
     else:
         st.error("Por favor, ingresa un tema para comenzar.")
