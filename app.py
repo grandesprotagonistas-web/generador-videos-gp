@@ -32,7 +32,7 @@ with col2:
 st.divider()
 
 # --- CONEXIÓN FORZADA A VERSIÓN ESTABLE V1 ---
-GOOGLE_API_KEY = "AIzaSyBRs7BCWWohYqNki9zE_pyHlx0NntZTofI"
+GOOGLE_API_KEY = "AIzaSyDwwARFP76pMG6VEEiMkKXUPlQLIvXpWds"
 
 # ESTA ES LA PARTE CLAVE: Forzamos la versión v1
 os.environ["GOOGLE_GENERATIVE_AI_NETWORK_ENDPOINT"] = "generativelanguage.googleapis.com"
