@@ -44,14 +44,14 @@ except Exception as e:
     st.error(f"⚠️ Error: {e}")
 
 # --- TRABAJO ---
-tema = st.text_input("🎯 Tema:", placeholder="Ej: Ahorro inteligente")
+tema = st.text_input("🎯 Tema:", placeholder="Ej: Pasos para el primer millón")
 formato = st.radio("Modo:", ["Manual", "Automático"], horizontal=True)
 
 if st.button("🚀 GENERAR"):
     if tema and api_ready:
         with st.status("🧠 Generando...", expanded=True) as status:
             try:
-                p = f"Crea 5 frases para un carrusel sobre {tema}. Usa el Método CEO. Formato: Frase | PalabraClave. 5 líneas."
+                p = f"Actúa como experto financiero. Crea 5 frases para un carrusel sobre {tema}. Usa el Método CEO. Formato: Frase | PalabraClave. Dame solo 5 líneas."
                 r = model.generate_content(p)
                 lineas = r.text.strip().split('\n')
                 
@@ -59,7 +59,8 @@ if st.button("🚀 GENERAR"):
                 for l in lineas:
                     if "|" in l:
                         txt, key = l.split("|")
-                        url = f"https://source.unsplash.com/featured/400x400?{key.strip()},minimal"
+                        # Usamos un servicio de imagen más estable
+                        url = f"https://loremflickr.com/400/400/{key.strip()},finance/all"
                         data.append({"t": txt.strip(), "i": url})
 
                 status.update(label="✅ Listo", state="complete")
@@ -68,11 +69,11 @@ if st.button("🚀 GENERAR"):
                     tabs = st.tabs([f"P{i+1}" for i in range(len(data))])
                     for i, tab in enumerate(tabs):
                         with tab:
-                            st.markdown(f'<div class="folio-card"><img src="{data[i]["i"]}" style="width:300px;border-radius:15px;"><div class="folio-text">{data[i]["t"]}</div></div>', unsafe_allow_html=True)
+                            st.markdown(f'<div class="folio-card"><img src="{data[i]["i"]}" style="width:300px;border-radius:15px;box-shadow: 0 4px 8px rgba(0,0,0,0.1);"><div class="folio-text">{data[i]["t"]}</div></div>', unsafe_allow_html=True)
                 else:
                     v = st.empty()
                     for d in data:
-                        v.markdown(f'<div class="folio-card"><img src="{d["i"]}" style="width:300px;border-radius:15px;"><div class="folio-text">{d["t"]}</div></div>', unsafe_allow_html=True)
+                        v.markdown(f'<div class="folio-card"><img src="{d["i"]}" style="width:300px;border-radius:15px;box-shadow: 0 4px 8px rgba(0,0,0,0.1);"><div class="folio-text">{d["t"]}</div></div>', unsafe_allow_html=True)
                         time.sleep(3.5)
             except Exception as e:
                 st.error(f"Error: {e}")
