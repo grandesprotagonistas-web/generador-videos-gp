@@ -28,7 +28,7 @@ st.title("📖 Folioscopio Estratégico GP")
 # --- CONEXIÓN SEGURA ---
 # Aquí el código busca la clave en la "Caja Fuerte" (Secrets)
 try:
-    api_key = st.secrets["GOOGLE_API_KEY"]
+    api_key = st.secrets["AIzaSyDwBgcj4pEE0Ey26hlr-rerWpUBM1_3p_s"]
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-1.5-flash") # Usamos 1.5 para mayor estabilidad de cuota
     api_funcional = True
