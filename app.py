@@ -5,7 +5,6 @@ import time
 # --- CONFIGURACIÓN DE IDENTIDAD ---
 st.set_page_config(page_title="Ecosistema Digital | Grandes Protagonistas", layout="centered")
 
-# Estilo Minimalista GP
 st.markdown("""
     <style>
     .main { background-color: #ffffff; }
@@ -31,19 +30,16 @@ with col2:
 
 st.divider()
 
-# --- CONEXIÓN ROBUSTA CON GOOGLE AI STUDIO ---
+# --- CONEXIÓN UNIVERSAL CON GOOGLE AI ---
 GOOGLE_API_KEY = "AIzaSyBRs7BCWWohYqNki9zE_pyHlx0NntZTofI"
 
 try:
     genai.configure(api_key=GOOGLE_API_KEY)
-    # Intentamos con la versión más estable y compatible
-    try:
-        model = genai.GenerativeModel('gemini-1.5-flash-latest')
-    except:
-        model = genai.GenerativeModel('gemini-pro')
+    # Usamos el nombre 'gemini-pro', que es el más estable y universalmente aceptado
+    model = genai.GenerativeModel('gemini-pro')
     api_funcional = True
 except Exception as error_config:
-    st.error(f"Error en la configuración de IA: {error_config}")
+    st.error(f"Error en la configuración: {error_config}")
     api_funcional = False
 
 # --- ÁREA DE TRABAJO ---
@@ -53,41 +49,37 @@ estilo = st.selectbox("Estilo visual:", ["Profesional Ejecutivo", "Inspirador Mi
 if st.button("🚀 GENERAR CONTENIDO COMPLETO"):
     if tema and api_funcional:
         with st.status("🧠 La IA está trabajando...", expanded=True) as status:
-            st.write("Investigando fuentes seguras en Google AI Studio...")
+            st.write("Investigando fuentes seguras...")
             try:
-                # Prompt optimizado para evitar errores de contenido
-                prompt = f"Actúa como un experto financiero. Investiga sobre '{tema}' y redacta un guion de 3 minutos para video, alineado al Método CEO de Grandes Protagonistas. Incluye gancho, 3 puntos clave y cierre."
+                # Prompt directo y potente
+                prompt = f"Actúa como un experto financiero de Grandes Protagonistas. Investiga sobre '{tema}' y redacta un guion de 3 minutos para video siguiendo el Método CEO. Incluye gancho, 3 puntos clave y cierre motivador."
                 response = model.generate_content(prompt)
                 guion_final = response.text
-            except Exception as error_ia:
-                # Si falla el modelo 1.5, intentamos con el Pro aquí mismo
-                try:
-                    model_backup = genai.GenerativeModel('gemini-pro')
-                    response = model_backup.generate_content(f"Guion de 3 min sobre {tema}")
-                    guion_final = response.text
-                except:
-                    guion_final = f"Lo siento, hubo un problema con la API de Google: {str(error_ia)}"
-            
-            st.write("Preparando visuales integrados...")
-            time.sleep(1)
-            status.update(label="✅ ¡Contenido Generado!", state="complete", expanded=False)
+                
+                st.write("Preparando visuales integrados...")
+                time.sleep(1)
+                status.update(label="✅ ¡Contenido Generado!", state="complete", expanded=False)
 
-        # --- RESULTADOS ---
-        st.subheader("🎥 Producción Visual GP")
-        st.markdown('<div class="video-container">', unsafe_allow_html=True)
-        urls = {
-            "Profesional Ejecutivo": "https://assets.mixkit.co/videos/preview/mixkit-hand-holding-a-gold-coin-4432-large.mp4",
-            "Inspirador Minimalista": "https://assets.mixkit.co/videos/preview/mixkit-woman-working-at-home-43224-large.mp4",
-            "Educativo Directo": "https://assets.mixkit.co/videos/preview/mixkit-stack-of-gold-coins-4433-large.mp4"
-        }
-        st.video(urls[estilo])
-        st.markdown('</div>', unsafe_allow_html=True)
+                # --- RESULTADOS ---
+                st.subheader("🎥 Producción Visual GP")
+                st.markdown('<div class="video-container">', unsafe_allow_html=True)
+                urls = {
+                    "Profesional Ejecutivo": "https://assets.mixkit.co/videos/preview/mixkit-hand-holding-a-gold-coin-4432-large.mp4",
+                    "Inspirador Minimalista": "https://assets.mixkit.co/videos/preview/mixkit-woman-working-at-home-43224-large.mp4",
+                    "Educativo Directo": "https://assets.mixkit.co/videos/preview/mixkit-stack-of-gold-coins-4433-large.mp4"
+                }
+                st.video(urls[estilo])
+                st.markdown('</div>', unsafe_allow_html=True)
 
-        st.divider()
-        st.subheader("📝 Guion Investigado")
-        st.info(guion_final)
+                st.divider()
+                st.subheader("📝 Guion Investigado")
+                st.info(guion_final)
 
-        st.subheader("📱 Marketing Toolkit")
-        st.code(f"#GrandesProtagonistas #MetodoCEO #FinanzasParaguay #{tema.replace(' ', '')}")
+                st.subheader("📱 Marketing Toolkit")
+                st.code(f"#GrandesProtagonistas #MetodoCEO #FinanzasParaguay #{tema.replace(' ', '')}")
+
+            except Exception as e:
+                st.error(f"Hubo un problema con la respuesta de Google: {str(e)}")
+                st.info("Tip: Asegúrate de que tu API Key no tenga espacios adicionales al principio o al final.")
     else:
         st.error("Por favor, ingresa un tema para comenzar.")
