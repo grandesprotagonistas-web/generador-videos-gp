@@ -30,13 +30,14 @@ with col2:
 
 st.divider()
 
-# --- CONEXIÓN ESTABLE CON GOOGLE AI ---
+# --- CONEXIÓN FORZADA A VERSIÓN ESTABLE ---
 GOOGLE_API_KEY = "AIzaSyBRs7BCWWohYqNki9zE_pyHlx0NntZTofI"
 
 try:
-    genai.configure(api_key=GOOGLE_API_KEY)
-    # Usamos el modelo 'gemini-1.5-flash' sin rutas de versiones beta
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    # Configuramos explícitamente la versión de transporte a 'rest' para evitar conflictos de v1beta
+    genai.configure(api_key=GOOGLE_API_KEY, transport='rest')
+    # Usamos el modelo con su nombre completo para que no haya confusión
+    model = genai.GenerativeModel('models/gemini-1.5-flash')
     api_funcional = True
 except Exception as error_config:
     st.error(f"Error en la configuración: {error_config}")
@@ -49,12 +50,11 @@ estilo = st.selectbox("Estilo visual:", ["Profesional Ejecutivo", "Inspirador Mi
 if st.button("🚀 GENERAR CONTENIDO COMPLETO"):
     if tema and api_funcional:
         with st.status("🧠 La IA está trabajando...", expanded=True) as status:
-            st.write("Conectando con la base de datos de Google...")
+            st.write("Conectando con Google AI (Versión Estable)...")
             try:
-                # Prompt directo
-                prompt = f"Actúa como un experto financiero. Investiga sobre '{tema}' y redacta un guion de 3 minutos para video siguiendo el Método CEO de Grandes Protagonistas. Incluye gancho, 3 puntos clave y cierre motivador."
+                prompt = f"Actúa como un experto financiero de Grandes Protagonistas. Investiga sobre '{tema}' y redacta un guion de 3 minutos para video siguiendo el Método CEO. Incluye gancho, 3 puntos clave y cierre."
                 
-                # Generación directa
+                # Generación
                 response = model.generate_content(prompt)
                 guion_final = response.text
                 
@@ -82,6 +82,6 @@ if st.button("🚀 GENERAR CONTENIDO COMPLETO"):
 
             except Exception as e:
                 st.error(f"Error de conexión: {str(e)}")
-                st.info("Nota: Si el error persiste, es posible que la API Key necesite un minuto para propagarse en los servidores de Google.")
+                st.info("Sugerencia: Si el error persiste, revisa que no haya restricciones de cuota en tu panel de Google AI Studio.")
     else:
         st.error("Por favor, ingresa un tema para comenzar.")
