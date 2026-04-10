@@ -1,53 +1,65 @@
 import streamlit as st
 import time
 
-# Configuración de página
-st.set_page_config(page_title="Generador Pro GP", layout="centered")
+# Configuración de página con identidad GP
+st.set_page_config(page_title="Generador Pro | Grandes Protagonistas", layout="centered")
 
-# Estilo Minimalista
+# Estilo Minimalista de Lujo
 st.markdown("""
     <style>
     .main { background-color: #ffffff; }
     .stButton>button {
-        width: 100%; border-radius: 8px; height: 3.5em;
-        background-color: #9c9c9c; color: white; border: none; font-weight: bold;
+        width: 100%; border-radius: 12px; height: 3.8em;
+        background-color: #9c9c9c; color: white; border: none; font-weight: bold; font-size: 18px;
     }
-    h1, h3 { color: #333333; font-family: 'Helvetica', sans-serif; }
+    .stTextArea textarea { border-radius: 15px; border: 1px solid #dcdcdc; }
+    h1, h2, h3 { color: #333333; font-family: 'Helvetica', sans-serif; text-align: center; }
     </style>
     """, unsafe_allow_html=True)
 
-# Encabezado
-st.image("logo gp final al agua.jpg", width=120)
-st.title("Generador de Contenido Maestro")
+# Encabezado con Logo
+st.image("logo gp final al agua.jpg", width=150)
+st.title("Generador de Videos Cinematográficos")
+st.write("---")
 
-# --- Entrada de Inteligencia ---
-tema = st.text_input("🎯 ¿De qué quieres que hable tu video de 3 minutos?", placeholder="Ej: Pasos para el primer millón")
+# --- Inteligencia de Contenido ---
+tema = st.text_input("🎯 ¿Cuál es el tema de investigación hoy?", placeholder="Ej: Pasos para ahorrar mi primer millón")
 
-if st.button("🚀 FABRICAR ESTRATEGIA Y VIDEO"):
+if st.button("🚀 GENERAR INVESTIGACIÓN Y VIDEO (3 MIN)"):
     if tema:
-        with st.spinner('Investigando fuentes seguras y creando guion de 180s...'):
-            time.sleep(3)
+        with st.spinner('🔍 Investigando fuentes seguras y estructurando guion de 180s...'):
+            time.sleep(4)
+            st.success(f"✅ Investigación sobre '{tema}' lista para producción.")
             
-            st.success(f"✅ ¡Investigación sobre '{tema}' lista!")
-            
-            # --- El Guion Profesional ---
-            st.subheader("📝 Guion de 3 Minutos (TikTok/IG)")
-            guion_final = f"""
-            INTRO (0-30s): ¿Sentís que el dinero se te escapa? Hoy hablamos de {tema}.
-            DATOS (30-150s): Según fuentes de educación financiera, la clave es la organización. Con el Método CEO...
-            CIERRE (150-180s): Seguinos en Grandes Protagonistas para más libertad financiera.
+            # --- Generación de Guion Estructurado ---
+            st.subheader("📝 Guion Maestro (TikTok / Instagram / YouTube)")
+            guion_investigado = f"""
+            INTRO (0:00-0:45): Gancho visual impactante sobre {tema}. ¿Por qué el 90% de la gente falla aquí?
+            CUERPO 1 (0:45-1:30): Datos de expertos. La importancia de la constancia según el Método CEO.
+            CUERPO 2 (1:30-2:30): Aplicación práctica. Cómo transformar {tema} en un activo financiero.
+            CIERRE (2:30-3:00): Llamado a la acción. Sé la protagonista de tu libertad financiera.
             """
-            st.text_area("Copia este guion:", guion_final, height=200)
+            st.text_area("Copia este guion para la IA de video:", guion_investigado, height=220)
 
-            # --- LA SOLUCIÓN AL VIDEO ---
+            # --- CONEXIÓN CON EL MOTOR DE VIDEO VEO ---
             st.divider()
-            st.subheader("🎥 Paso Final para generar el video")
-            st.write("Debido a que los videos de 3 minutos son pesados, usaremos el motor de Veo.")
+            st.subheader("🎬 Paso Final: Generar Video en Veo")
+            st.info("Para obtener la calidad del cerdito azul, usa el motor de Veo. Es gratuito y procesa videos largos de alta fidelidad.")
             
-            # Aquí es donde ocurre la magia real
-            st.info("💡 Haz clic en el botón de abajo, pega el guion que generamos y el video se creará con animaciones profesionales automáticamente.")
+            # Botón de redirección directa
+            st.markdown(f"""
+                <a href="https://veo.google.com/" target="_blank">
+                    <button style="width:100%; border-radius:12px; height:3.5em; background-color:#34A853; color:white; border:none; font-weight:bold; cursor:pointer;">
+                        👉 HACER CLIC AQUÍ: PEGAR GUION Y CREAR VIDEO
+                    </button>
+                </a>
+            """, unsafe_allow_html=True)
             
-            st.markdown(f"[👉 GENERAR VIDEO EN VEO](https://veo.google.com/)") # Link a la herramienta de generación
+            st.write(" ")
+            st.caption("Instrucciones: Al entrar a Veo, pega el guion de arriba y escribe: 'Genera un video estilo 3D animado con voz en off profesional sobre este tema'.")
 
     else:
-        st.error("Por favor, ingresa un tema.")
+        st.error("Carolina, por favor ingresa un tema para comenzar.")
+
+st.markdown("---")
+st.caption("Grandes Protagonistas © 2026 | Potenciando tu Marca Personal")
