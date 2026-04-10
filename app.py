@@ -5,7 +5,7 @@ from textblob import TextBlob
 # Configuración de página
 st.set_page_config(page_title="Grandes Protagonistas AI", layout="centered")
 
-# Estilo Minimalista
+# Estilo Minimalista (Gris Profesional)
 st.markdown("""
     <style>
     .main { background-color: #ffffff; }
@@ -23,13 +23,11 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Encabezado con Logo
+# Encabezado
 col1, col2 = st.columns([1, 4])
 with col1:
-    try:
-        st.image("logo gp final al agua.jpg", width=90)
-    except:
-        st.warning("Logo no encontrado. Sube logo_gp.png a GitHub.")
+    # Usamos el nombre exacto de tu archivo subido
+    st.image("logo gp final al agua.jpg", width=90)
 with col2:
     st.title("Generador de Contenido GP")
 
@@ -40,7 +38,7 @@ with st.container():
     st.subheader("📝 Guion del Video")
     prompt = st.text_area(
         "Contenido para TikTok:",
-        placeholder="Ej: El ahorro de emergencia ideal es del 20%...",
+        placeholder="Ej: El éxito financiero no es un secreto...",
         height=180
     )
 
@@ -53,24 +51,27 @@ with st.container():
 # --- Proceso de Generación ---
 if st.button("CREAR VIDEO PROFESIONAL"):
     if prompt:
+        # Control de Calidad Ortográfica
         blob = TextBlob(prompt)
         texto_corregido = str(blob.correct())
         
-        if texto_corregido.lower() != prompt.lower():
-            st.warning("Nota: Ortografía revisada para mantener la excelencia.")
+        with st.spinner('🎬 El experto en Marketing está montando tu video profesional...'):
+            time.sleep(4) 
+            st.success("¡Video optimizado generado con éxito!")
+            
+            # CAMBIO CLAVE: Video de stock financiero real (monedas y crecimiento)
+            video_url = "https://assets.mixkit.co/videos/preview/mixkit-stack-of-gold-coins-4433-large.mp4"
+            st.video(video_url)
 
-        with st.spinner('🎬 Renderizando video con marca Grandes Protagonistas...'):
-            time.sleep(3) 
-            st.success("¡Video generado con éxito!")
-            st.video("https://www.w3schools.com/html/mov_bbb.mp4")
-
+            # --- Estrategia de Marketing ---
             st.divider()
-            st.subheader("📈 Estrategia de Marketing")
+            st.subheader("🚀 Marketing Ready")
             
             resumen = texto_corregido[:110]
-            pie_texto = f"{resumen}... ¡Sé el protagonista de tu libertad financiera!"
-            hashtags = "#GrandesProtagonistas #MetodoCEO #EducacionFinanciera #Paraguay"
+            pie_texto = f"{resumen}... ¡Sé el protagonista de tu libertad financiera! 💼"
+            hashtags = "#GrandesProtagonistas #MetodoCEO #EducacionFinanciera #FinanzasParaguay"
             
+            st.info("Sugerencia: Este contenido genera confianza y autoridad en tu marca.")
             st.code(f"PIE DE VIDEO:\n{pie_texto}\n\nHASHTAGS:\n{hashtags}")
 
             st.download_button(
