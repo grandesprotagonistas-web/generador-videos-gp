@@ -3,8 +3,9 @@ import google.generativeai as genai
 import time
 
 # --- CONFIGURACIÓN DE IDENTIDAD ---
-st.set_page_config(page_title="Ecosistema Digital | Grandes Protagonistas", layout="centered")
+st.set_page_config(page_title="Ecosistema GP | Presentación Animada", layout="centered")
 
+# Estilo para el Formato Vertical (Reel Style)
 st.markdown("""
     <style>
     .main { background-color: #ffffff; }
@@ -12,69 +13,72 @@ st.markdown("""
         width: 100%; border-radius: 12px; height: 3.5em;
         background-color: #4a4a4a; color: white; border: none; font-weight: bold;
     }
-    h1, h3 { color: #333333; font-family: 'Helvetica Neue', sans-serif; }
-    .video-container { border: 2px solid #f0f0f0; border-radius: 15px; overflow: hidden; padding: 10px; background: #fafafa; }
+    /* Estilo del Contenedor Vertical */
+    .vertical-reel {
+        width: 320px; height: 568px; 
+        background: linear-gradient(180deg, #f0f0f0 0%, #dcdcdc 100%);
+        border: 8px solid #333; border-radius: 25px;
+        margin: auto; position: relative; overflow: hidden;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        text-align: center; padding: 20px; box-shadow: 0px 10px 30px rgba(0,0,0,0.1);
+    }
+    .reel-text { color: #333; font-family: 'Helvetica Neue', sans-serif; font-weight: bold; font-size: 22px; }
+    .reel-logo { position: absolute; top: 20px; width: 50px; opacity: 0.6; }
     </style>
     """, unsafe_allow_html=True)
 
 # Encabezado
-col1, col2 = st.columns([1, 4])
-with col1:
-    try:
-        st.image("logo gp final al agua.jpg", width=100)
-    except:
-        st.markdown("### 🏆 GP")
-with col2:
-    st.title("Generador Integral GP")
-    st.write("Estrategia 360° para el Método CEO")
+st.title("Generador de Contenido Vertical")
+st.write("Estrategia Visual Grandes Protagonistas")
 
-st.divider()
-
-# --- CONEXIÓN CON EL MODELO DETECTADO (2.5 FLASH) ---
+# --- CONEXIÓN IA ---
 GOOGLE_API_KEY = "AIzaSyDwwARFP76pMG6VEEiMkKXUPlQLIvXpWds"
 genai.configure(api_key=GOOGLE_API_KEY)
-
-# Usamos el nombre exacto que nos dio tu App
 MODELO_GP = "gemini-2.5-flash"
 
-# --- ÁREA DE TRABAJO ---
-tema = st.text_input("🎯 ¿Qué tema investigamos hoy?", placeholder="Ej: Pasos para el ahorro de emergencia")
-estilo = st.selectbox("Estilo visual del video:", ["Profesional Ejecutivo", "Inspirador Minimalista", "Educativo Directo"])
+# --- ENTRADA DE DATOS ---
+tema = st.text_input("🎯 Tema para tu Reel/TikTok:", placeholder="Ej: 3 errores que matan tus ahorros")
 
-if st.button("🚀 GENERAR CONTENIDO COMPLETO"):
+if st.button("🚀 CREAR PRESENTACIÓN ANIMADA"):
     if tema:
-        with st.status(f"🧠 Generando con {MODELO_GP}...", expanded=True) as status:
+        with st.status("🧠 La IA está diseñando la secuencia...", expanded=True) as status:
             try:
                 model = genai.GenerativeModel(MODELO_GP)
-                prompt = f"Actúa como experto financiero de Grandes Protagonistas. Investiga sobre '{tema}' y redacta un guion de 3 min para video siguiendo el Método CEO. Incluye gancho, 3 puntos clave y cierre motivador."
+                # Pedimos a la IA que divida el guion en "escenas" cortas
+                prompt = f"Actúa como experto en redes sociales. Crea 5 frases cortas y potentes sobre '{tema}' para un Reel de 15 segundos. Usa el Método CEO. Devuélveme solo las 5 frases separadas por comas."
                 
                 response = model.generate_content(prompt)
-                guion_final = response.text
+                frases = response.text.split(',')
                 
-                status.update(label="✅ ¡Contenido Generado!", state="complete", expanded=False)
+                status.update(label="✅ Secuencia Diseñada", state="complete", expanded=False)
 
-                # --- DESPLIEGUE DE RESULTADOS ---
-                st.subheader("🎥 Producción Visual GP")
-                st.markdown('<div class="video-container">', unsafe_allow_html=True)
-                urls = {
-                    "Profesional Ejecutivo": "https://assets.mixkit.co/videos/preview/mixkit-hand-holding-a-gold-coin-4432-large.mp4",
-                    "Inspirador Minimalista": "https://assets.mixkit.co/videos/preview/mixkit-woman-working-at-home-43224-large.mp4",
-                    "Educativo Directo": "https://assets.mixkit.co/videos/preview/mixkit-stack-of-gold-coins-4433-large.mp4"
-                }
-                st.video(urls[estilo])
-                st.markdown('</div>', unsafe_allow_html=True)
-
+                # --- REPRODUCTOR ANIMADO (Simulación de Presentación) ---
+                st.subheader("🎥 Vista Previa Vertical")
+                
+                # Contenedor de la animación
+                reel_placeholder = st.empty()
+                
+                for frase in frases:
+                    # Creamos el efecto de "diapositiva"
+                    reel_placeholder.markdown(f"""
+                        <div class="vertical-reel">
+                            <div class="reel-logo">🏆</div>
+                            <div class="reel-text">{frase.strip()}</div>
+                            <div style="position: absolute; bottom: 30px; font-size: 12px; color: #888;">
+                                Grandes Protagonistas | Método CEO
+                            </div>
+                        </div>
+                    """, unsafe_allow_html=True)
+                    time.sleep(3) # Tiempo que dura cada frase en pantalla
+                
+                st.success("🏁 Presentación completada. Puedes capturar pantalla para tus historias.")
+                
+                # --- GUION COMPLETO ---
                 st.divider()
-                st.subheader("📝 Guion Investigado (3 min)")
-                st.info(guion_final)
-
-                st.subheader("📱 Marketing Toolkit")
-                st.code(f"#GrandesProtagonistas #MetodoCEO #FinanzasParaguay #{tema.replace(' ', '')}")
+                st.subheader("📝 Guion Completo Detallado")
+                st.write(response.text)
 
             except Exception as e:
-                st.error(f"Error técnico: {str(e)}")
+                st.error(f"Error: {str(e)}")
     else:
-        st.error("Por favor, ingresa un tema.")
-
-st.write("---")
-st.caption("Grandes Protagonistas © 2026 | Impulsado por Gemini 2.5 Flash")
+        st.error("Ingresa un tema.")
