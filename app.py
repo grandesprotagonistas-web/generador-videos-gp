@@ -18,7 +18,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Encabezado Seguro
+# Encabezado
 col1, col2 = st.columns([1, 4])
 with col1:
     try:
@@ -27,37 +27,39 @@ with col1:
         st.markdown("### 🏆 GP")
 with col2:
     st.title("Generador Integral GP")
-    st.write("Inteligencia Estratégica para el Método CEO")
 
 st.divider()
 
-# --- CONEXIÓN FORZADA A VERSIÓN ESTABLE V1 ---
+# --- CONEXIÓN E INVESTIGACIÓN DE MODELOS ---
 GOOGLE_API_KEY = "AIzaSyDwwARFP76pMG6VEEiMkKXUPlQLIvXpWds"
+genai.configure(api_key=GOOGLE_API_KEY)
 
-# ESTA ES LA PARTE CLAVE: Forzamos la versión v1
-os.environ["GOOGLE_GENERATIVE_AI_NETWORK_ENDPOINT"] = "generativelanguage.googleapis.com"
+def buscar_modelo_compatible():
+    try:
+        # Pedimos a la App que investigue qué modelos tienes permitidos
+        for m in genai.list_models():
+            if 'generateContent' in m.supported_generation_methods:
+                return m.name
+        return None
+    except Exception as e:
+        return f"Error al listar modelos: {e}"
 
-try:
-    genai.configure(api_key=GOOGLE_API_KEY)
-    # Probamos con el nombre del modelo sin el prefijo 'models/' para que la v1 lo reconozca
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    api_funcional = True
-except Exception as error_config:
-    st.error(f"Error en la configuración: {error_config}")
-    api_funcional = False
+modelo_disponible = buscar_modelo_compatible()
 
 # --- ÁREA DE TRABAJO ---
+st.info(f"🤖 **Modelo detectado por la App:** {modelo_disponible}")
+
 tema = st.text_input("🎯 ¿Qué tema investigamos hoy?", placeholder="Ej: Importancia del fondo de emergencia")
 estilo = st.selectbox("Estilo visual:", ["Profesional Ejecutivo", "Inspirador Minimalista", "Educativo Directo"])
 
 if st.button("🚀 GENERAR CONTENIDO COMPLETO"):
-    if tema and api_funcional:
-        with st.status("🧠 Conectando con Google V1...", expanded=True) as status:
+    if tema and "models/" in str(modelo_disponible):
+        with st.status(f"🧠 Usando {modelo_disponible}...", expanded=True) as status:
             try:
-                # Especificamos el contenido de forma simple
-                prompt = f"Actúa como experto financiero. Redacta un guion de 3 min sobre {tema} para el Método CEO."
+                # Usamos el modelo que la propia App encontró
+                model = genai.GenerativeModel(modelo_disponible)
+                prompt = f"Actúa como experto financiero. Redacta un guion de 3 min sobre {tema} para el Método CEO de Grandes Protagonistas."
                 
-                # Llamada a la generación
                 response = model.generate_content(prompt)
                 guion_final = response.text
                 
@@ -77,14 +79,8 @@ if st.button("🚀 GENERAR CONTENIDO COMPLETO"):
                 st.divider()
                 st.subheader("📝 Guion Investigado")
                 st.info(guion_final)
-                
-                st.subheader("📱 Marketing Toolkit")
-                st.code(f"#GrandesProtagonistas #MetodoCEO #FinanzasParaguay")
 
             except Exception as e:
-                # Si sigue fallando, mostramos un mensaje de diagnóstico
-                st.error("Error persistente de API.")
-                st.write(f"Detalle técnico: {str(e)}")
-                st.info("Carolina, si este error persiste, intenta crear una NUEVA API Key en AI Studio, a veces las llaves viejas se quedan pegadas a la versión beta.")
+                st.error(f"Fallo en la generación: {str(e)}")
     else:
-        st.error("Por favor, ingresa un tema.")
+        st.error("No se detectó un modelo compatible o falta el tema.")
