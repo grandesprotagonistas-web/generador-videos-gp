@@ -26,18 +26,18 @@ st.markdown("""
 st.title("📖 Folioscopio Estratégico GP")
 
 # --- CONEXIÓN SEGURA ---
-# Aquí el código busca la clave en la "Caja Fuerte" (Secrets)
 try:
-    api_key = st.secrets["AIzaSyDwBgcj4pEE0Ey26hlr-rerWpUBM1_3p_s"]
+    # IMPORTANTE: Aquí usamos el nombre de la variable, NO la clave directamente
+    api_key = st.secrets["GOOGLE_API_KEY"] 
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-1.5-flash") # Usamos 1.5 para mayor estabilidad de cuota
+    model = genai.GenerativeModel("gemini-1.5-flash")
     api_funcional = True
 except Exception as e:
-    st.error("⚠️ Error de Seguridad: La API Key no está configurada en los Secrets de Streamlit.")
+    st.error("⚠️ Error: No se encontró 'GOOGLE_API_KEY' en los Secrets de Streamlit.")
     api_funcional = False
 
 # --- ÁREA DE TRABAJO ---
-tema = st.text_input("🎯 Tema para el folioscopio:", placeholder="Ej: Gestión del tiempo para madres emprendedoras")
+tema = st.text_input("🎯 Tema para el folioscopio:", placeholder="Ej: Gestión del tiempo para madres")
 
 if st.button("🚀 GENERAR FOLIOSCOPIO"):
     if tema and api_funcional:
@@ -47,16 +47,18 @@ if st.button("🚀 GENERAR FOLIOSCOPIO"):
                 response = model.generate_content(prompt)
                 lineas = response.text.strip().split('\n')
                 
-                # Renderizado
                 placeholder = st.empty()
                 for linea in lineas:
                     if "|" in linea:
-                        texto, keyword = linea.split("|")
-                        img_url = f"https://source.unsplash.com/featured/?{keyword.strip()},minimal"
+                        partes = linea.split("|")
+                        texto = partes[0].strip()
+                        keyword = partes[1].strip()
+                        img_url = f"https://source.unsplash.com/featured/?{keyword},minimal"
+                        
                         placeholder.markdown(f"""
                             <div class="folio-page">
                                 <img src="{img_url}" style="width: 300px; border-radius: 15px;">
-                                <div class="folio-text">{texto.strip()}</div>
+                                <div class="folio-text">{texto}</div>
                             </div>
                         """, unsafe_allow_html=True)
                         time.sleep(3.5)
