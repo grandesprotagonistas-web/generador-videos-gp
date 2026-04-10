@@ -2,8 +2,8 @@ import streamlit as st
 import google.generativeai as genai
 import time
 
-# --- IDENTIDAD VISUAL GP ---
-st.set_page_config(page_title="Folioscopio Pro | GP", layout="centered")
+# --- CONFIGURACIÓN ---
+st.set_page_config(page_title="Folioscopio GP", layout="centered")
 
 st.markdown("""
     <style>
@@ -19,43 +19,62 @@ st.markdown("""
         min-height: 500px; display: flex; flex-direction: column;
         align-items: center; justify-content: center;
     }
-    .folio-text { font-size: 26px; color: #333333; font-weight: 700; line-height: 1.4; margin-top: 25px; }
-    .folio-sub { color: #9c9c9c; font-size: 14px; text-transform: uppercase; margin-bottom: 20px; }
+    .folio-text { font-size: 24px; color: #333333; font-weight: 700; line-height: 1.4; margin-top: 25px; }
     </style>
     """, unsafe_allow_html=True)
 
 st.title("📖 Folioscopio Estratégico GP")
-st.write("Ecosistema Digital | Método CEO")
 
-# --- CONEXIÓN SEGURA Y AUTO-DETECCIÓN ---
+# --- CONEXIÓN ---
 api_ready = False
 modelo_final = "gemini-1.5-flash"
 
 try:
     if "GOOGLE_API_KEY" in st.secrets:
-        api_key = st.secrets["GOOGLE_API_KEY"]
-        genai.configure(api_key=api_key)
-        
-        # Detectar modelos disponibles
-        modelos_disponibles = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-        if modelos_disponibles:
-            modelo_final = modelos_disponibles[0]
-        
+        genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
+        modelos = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+        if modelos:
+            modelo_final = modelos[0]
         model = genai.GenerativeModel(modelo_final)
         api_ready = True
-        st.caption(f"🚀 Motor activo: {modelo_final}")
+        st.caption(f"🚀 Motor: {modelo_final}")
     else:
-        st.error("⚠️ Falta 'GOOGLE_API_KEY' en los Secrets de Streamlit.")
+        st.error("⚠️ Configura GOOGLE_API_KEY en Secrets.")
 except Exception as e:
-    st.error(f"⚠️ Error de configuración: {e}")
+    st.error(f"⚠️ Error: {e}")
 
-# --- ÁREA DE TRABAJO ---
-tema = st.text_input("🎯 ¿Qué estrategia visual creamos?", placeholder="Ej: Pasos para el primer millón")
-formato = st.radio("Experiencia:", ["Carrusel (Manual)", "Folioscopio (Automático)"], horizontal=True)
+# --- TRABAJO ---
+tema = st.text_input("🎯 Tema:", placeholder="Ej: Ahorro inteligente")
+formato = st.radio("Modo:", ["Manual", "Automático"], horizontal=True)
 
-if st.button("🚀 GENERAR SECUENCIA VISUAL"):
+if st.button("🚀 GENERAR"):
     if tema and api_ready:
-        with st.status(f"🧠 Generando con {modelo_final}...", expanded=True) as status:
+        with st.status("🧠 Generando...", expanded=True) as status:
             try:
-                prompt = f"Crea 5 escenas para un carrusel sobre '{tema}'. Sigue el Método CEO. Formato de respuesta: Texto impactante | PalabraClaveImagen. Dame 5 líneas."
-                response =
+                p = f"Crea 5 frases para un carrusel sobre {tema}. Usa el Método CEO. Formato: Frase | PalabraClave. 5 líneas."
+                r = model.generate_content(p)
+                lineas = r.text.strip().split('\n')
+                
+                data = []
+                for l in lineas:
+                    if "|" in l:
+                        txt, key = l.split("|")
+                        url = f"https://source.unsplash.com/featured/400x400?{key.strip()},minimal"
+                        data.append({"t": txt.strip(), "i": url})
+
+                status.update(label="✅ Listo", state="complete")
+
+                if formato == "Manual":
+                    tabs = st.tabs([f"P{i+1}" for i in range(len(data))])
+                    for i, tab in enumerate(tabs):
+                        with tab:
+                            st.markdown(f'<div class="folio-card"><img src="{data[i]["i"]}" style="width:300px;border-radius:15px;"><div class="folio-text">{data[i]["t"]}</div></div>', unsafe_allow_html=True)
+                else:
+                    v = st.empty()
+                    for d in data:
+                        v.markdown(f'<div class="folio-card"><img src="{d["i"]}" style="width:300px;border-radius:15px;"><div class="folio-text">{d["t"]}</div></div>', unsafe_allow_html=True)
+                        time.sleep(3.5)
+            except Exception as e:
+                st.error(f"Error: {e}")
+    else:
+        st.warning("Verifica el tema y la API Key.")
