@@ -1,5 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
+import os
 import time
 
 # --- CONFIGURACIÓN DE IDENTIDAD ---
@@ -30,14 +31,16 @@ with col2:
 
 st.divider()
 
-# --- CONEXIÓN FORZADA A VERSIÓN ESTABLE ---
+# --- CONEXIÓN FORZADA A VERSIÓN ESTABLE V1 ---
 GOOGLE_API_KEY = "AIzaSyBRs7BCWWohYqNki9zE_pyHlx0NntZTofI"
 
+# ESTA ES LA PARTE CLAVE: Forzamos la versión v1
+os.environ["GOOGLE_GENERATIVE_AI_NETWORK_ENDPOINT"] = "generativelanguage.googleapis.com"
+
 try:
-    # Configuramos explícitamente la versión de transporte a 'rest' para evitar conflictos de v1beta
-    genai.configure(api_key=GOOGLE_API_KEY, transport='rest')
-    # Usamos el modelo con su nombre completo para que no haya confusión
-    model = genai.GenerativeModel('models/gemini-1.5-flash')
+    genai.configure(api_key=GOOGLE_API_KEY)
+    # Probamos con el nombre del modelo sin el prefijo 'models/' para que la v1 lo reconozca
+    model = genai.GenerativeModel('gemini-1.5-flash')
     api_funcional = True
 except Exception as error_config:
     st.error(f"Error en la configuración: {error_config}")
@@ -49,17 +52,15 @@ estilo = st.selectbox("Estilo visual:", ["Profesional Ejecutivo", "Inspirador Mi
 
 if st.button("🚀 GENERAR CONTENIDO COMPLETO"):
     if tema and api_funcional:
-        with st.status("🧠 La IA está trabajando...", expanded=True) as status:
-            st.write("Conectando con Google AI (Versión Estable)...")
+        with st.status("🧠 Conectando con Google V1...", expanded=True) as status:
             try:
-                prompt = f"Actúa como un experto financiero de Grandes Protagonistas. Investiga sobre '{tema}' y redacta un guion de 3 minutos para video siguiendo el Método CEO. Incluye gancho, 3 puntos clave y cierre."
+                # Especificamos el contenido de forma simple
+                prompt = f"Actúa como experto financiero. Redacta un guion de 3 min sobre {tema} para el Método CEO."
                 
-                # Generación
+                # Llamada a la generación
                 response = model.generate_content(prompt)
                 guion_final = response.text
                 
-                st.write("Estructurando visuales...")
-                time.sleep(1)
                 status.update(label="✅ ¡Contenido Generado!", state="complete", expanded=False)
 
                 # --- RESULTADOS ---
@@ -76,12 +77,14 @@ if st.button("🚀 GENERAR CONTENIDO COMPLETO"):
                 st.divider()
                 st.subheader("📝 Guion Investigado")
                 st.info(guion_final)
-
+                
                 st.subheader("📱 Marketing Toolkit")
-                st.code(f"#GrandesProtagonistas #MetodoCEO #FinanzasParaguay #{tema.replace(' ', '')}")
+                st.code(f"#GrandesProtagonistas #MetodoCEO #FinanzasParaguay")
 
             except Exception as e:
-                st.error(f"Error de conexión: {str(e)}")
-                st.info("Sugerencia: Si el error persiste, revisa que no haya restricciones de cuota en tu panel de Google AI Studio.")
+                # Si sigue fallando, mostramos un mensaje de diagnóstico
+                st.error("Error persistente de API.")
+                st.write(f"Detalle técnico: {str(e)}")
+                st.info("Carolina, si este error persiste, intenta crear una NUEVA API Key en AI Studio, a veces las llaves viejas se quedan pegadas a la versión beta.")
     else:
-        st.error("Por favor, ingresa un tema para comenzar.")
+        st.error("Por favor, ingresa un tema.")
