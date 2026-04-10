@@ -1,22 +1,24 @@
 import streamlit as st
+import google.generativeai as genai
 import time
 
-# Configuración Estética Grandes Protagonistas
-st.set_page_config(page_title="Sistema Integral GP", layout="centered")
+# --- CONFIGURACIÓN DE IDENTIDAD GP ---
+st.set_page_config(page_title="Sistema Integral Grandes Protagonistas", layout="centered")
 
+# Estilo Minimalista de Lujo
 st.markdown("""
     <style>
-    .main { background-color: #f8f9fa; }
+    .main { background-color: #ffffff; }
     .stButton>button {
         width: 100%; border-radius: 10px; height: 3.5em;
-        background-color: #4a4a4a; color: white; border: none; font-weight: bold;
+        background-color: #9c9c9c; color: white; border: none; font-weight: bold;
     }
-    .video-box { border: 2px solid #9c9c9c; border-radius: 15px; padding: 10px; background: white; }
-    h1, h3 { color: #333333; font-family: 'Helvetica Neue', sans-serif; }
+    .video-container { border: 2px solid #dcdcdc; border-radius: 15px; overflow: hidden; }
+    h1, h3 { color: #333333; font-family: 'Helvetica', sans-serif; }
     </style>
     """, unsafe_allow_html=True)
 
-# Encabezado Centralizado
+# Encabezado con Logo
 col1, col2 = st.columns([1, 4])
 with col1:
     try:
@@ -25,59 +27,45 @@ with col1:
         st.write("🏆 **GP**")
 with col2:
     st.title("Ecosistema Digital GP")
-    st.write("Generador de Contenido y Estrategia Integral")
+    st.write("Impulsado por Google AI")
 
-st.divider()
+# --- CONEXIÓN CON TU API KEY ---
+# Pegá acá tu clave de Google AI Studio
+GOOGLE_API_KEY = "AIzaSyBRs7BCWWohYqNki9zE_pyHlx0NntZTofI"
 
-# --- Área de Trabajo ---
-tema = st.text_input("🎯 Tema del contenido:", placeholder="Ej: Importancia del ahorro programado")
-estilo = st.selectbox("Estilo Visual:", ["Profesional/Ejecutivo", "Minimalista/Inspirador", "Directo/Educativo"])
+if GOOGLE_API_KEY != "AIzaSyBRs7BCWWohYqNki9zE_pyHlx0NntZTofI":
+    genai.configure(api_key=GOOGLE_API_KEY)
+    model = genai.Model(model_name="gemini-1.5-flash")
+else:
+    st.warning("⚠️ Por favor, ingresa tu API Key de Google en el código para activar la investigación.")
 
-if st.button("🚀 GENERAR CONTENIDO COMPLETO"):
-    if tema:
-        # FASE 1: Investigación
-        with st.status("🧠 Investigando fuentes seguras...", expanded=True) as status:
-            st.write("Buscando datos de educación financiera...")
-            time.sleep(2)
-            st.write("Estructurando guion de 180 segundos para el Método CEO...")
-            time.sleep(2)
-            st.write("Seleccionando recursos visuales...")
-            time.sleep(1)
-            status.update(label="✅ ¡Contenido Generado!", state="complete", expanded=False)
+# --- ÁREA DE TRABAJO ---
+tema = st.text_input("🎯 ¿Qué tema investigamos hoy?", placeholder="Ej: Pasos para el primer millón con el Método CEO")
 
-        # FASE 2: Despliegue de Video (Dentro de la App)
-        st.subheader("🎥 Tu Video Terminado")
-        
-        # Seleccionamos un video real de stock según el tema (Simulación de Motor de Render)
-        videos_stock = {
-            "Profesional/Ejecutivo": "https://assets.mixkit.co/videos/preview/mixkit-hand-holding-a-gold-coin-4432-large.mp4",
-            "Minimalista/Inspirador": "https://assets.mixkit.co/videos/preview/mixkit-woman-writing-in-a-notebook-at-a-desk-43302-large.mp4",
-            "Directo/Educativo": "https://assets.mixkit.co/videos/preview/mixkit-stack-of-gold-coins-4433-large.mp4"
-        }
-        
-        with st.container():
-            st.video(videos_stock[estilo])
-            st.caption(f"Video generado automáticamente para: {tema}")
+if st.button("🚀 GENERAR CONTENIDO INTEGRAL"):
+    if tema and GOOGLE_API_KEY != "AIzaSyBRs7BCWWohYqNki9zE_pyHlx0NntZTofI":
+        with st.spinner('🧠 La IA está investigando fuentes seguras...'):
+            # 1. Investigación Real con Google Gemini
+            prompt = f"Investiga sobre {tema} para un video de 3 minutos. Dame un guion educativo, profesional y optimizado para el Método CEO de Grandes Protagonistas."
+            response = model.generate_content(prompt)
+            guion_ia = response.text
 
-        # FASE 3: Herramientas de Marketing
-        st.divider()
-        col_left, col_right = st.columns(2)
-        
-        with col_left:
-            st.write("📝 **Guion Producido:**")
-            guion = f"El éxito con '{tema}' no es suerte, es sistema. Con el Método CEO aprendemos que..."
-            st.info(guion)
+            # 2. Selección de Video de Fondo (Simulado para que no se vea negro)
+            video_url = "https://assets.mixkit.co/videos/preview/mixkit-woman-working-on-a-laptop-at-home-43224-large.mp4"
             
-        with col_right:
-            st.write("📱 **Hashtags y Copy:**")
-            st.code(f"#GrandesProtagonistas\n#MetodoCEO\n#FinanzasInteligentes\n#Paraguay")
+            st.success("✅ ¡Contenido Generado!")
+            
+            # --- DESPLIEGUE EN UNA SOLA PÁGINA ---
+            st.subheader("🎥 Producción Visual GP")
+            st.video(video_url)
+            
+            st.divider()
+            
+            st.subheader("📝 Guion Investigado (3 min)")
+            st.info(guion_ia)
 
-        # Botón de Descarga Real
-        st.download_button(
-            label="📥 Descargar Video para Redes",
-            data="video_data", # En una versión con servidor de render aquí iría el archivo real
-            file_name=f"GP_{tema}.mp4",
-            mime="video/mp4"
-        )
+            st.subheader("📱 Kit de Marketing")
+            st.code(f"#GrandesProtagonistas #MetodoCEO #FinanzasParaguay #{tema.replace(' ', '')}")
+            
     else:
-        st.error("Por favor, ingresa un tema para activar la IA.")
+        st.error("Falta el tema o la API Key.")
