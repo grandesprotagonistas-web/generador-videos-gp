@@ -17,16 +17,16 @@ st.markdown("""
 st.title("📖 Folioscopio & Copywriter GP")
 st.write("Estrategia Completa: Visual + Texto + Hashtags")
 
-# --- CONEXIÓN ---
-@st.cache_resource
+# --- CONEXIÓN (VERSIÓN SIN CACHÉ FORZADA) ---
 def load_model():
     if "GOOGLE_API_KEY" in st.secrets:
+        # Usamos directamente la configuración para evitar que el caché guarde errores viejos
         genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
         return genai.GenerativeModel('gemini-1.5-flash')
     return None
 
+# Intentar cargar el modelo en cada refresco para asegurar que la cuota esté fresca
 model = load_model()
-
 # --- INTERFAZ ---
 tema = st.text_input("🎯 Tema de la estrategia:", placeholder="Ej: 3 pasos para salir de deudas")
 modo = st.radio("Formato Visual:", ["Manual", "Automático"], horizontal=True)
