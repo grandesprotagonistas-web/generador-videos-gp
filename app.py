@@ -2,8 +2,8 @@ import streamlit as st
 import google.generativeai as genai
 import time
 
-# --- CONFIGURACIÓN DE IDENTIDAD ---
-st.set_page_config(page_title="Folioscopio Seguro | GP", layout="centered")
+# --- IDENTIDAD VISUAL GRANDES PROTAGONISTAS ---
+st.set_page_config(page_title="Folioscopio GP | Método CEO", layout="centered")
 
 st.markdown("""
     <style>
@@ -12,57 +12,96 @@ st.markdown("""
         width: 100%; border-radius: 12px; height: 3.5em;
         background-color: #4a4a4a; color: white; border: none; font-weight: bold;
     }
-    .folio-page {
-        width: 100%; height: 500px;
-        background-color: #f9f9f9; border: 2px solid #e0e0e0;
-        border-radius: 20px; display: flex; flex-direction: column;
+    .folio-card {
+        background-color: #fcfcfc; border: 1px solid #eeeeee;
+        border-radius: 25px; padding: 40px; text-align: center;
+        box-shadow: 0px 10px 25px rgba(0,0,0,0.05);
+        min-height: 500px; display: flex; flex-direction: column;
         align-items: center; justify-content: center;
-        padding: 30px; text-align: center;
     }
-    .folio-text { font-size: 24px; color: #333; font-weight: 600; margin-top: 20px; }
+    .folio-text { font-size: 26px; color: #333333; font-weight: 700; line-height: 1.4; margin-top: 25px; }
+    .folio-sub { color: #9c9c9c; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("📖 Folioscopio Estratégico GP")
+# Encabezado Minimalista
+col1, col2 = st.columns([1, 4])
+with col1:
+    st.markdown("### 🏆")
+with col2:
+    st.title("Folioscopio Estratégico")
+    st.write("Ecosistema Digital Grandes Protagonistas")
 
-# --- CONEXIÓN SEGURA ---
+st.divider()
+
+# --- CONEXIÓN SEGURA CON LOS SECRETS ---
 try:
-    # IMPORTANTE: Aquí usamos el nombre de la variable, NO la clave directamente
-    api_key = st.secrets["GOOGLE_API_KEY"] 
+    # Aquí buscamos la clave que guardaste en "Misterios"
+    api_key = st.secrets["GOOGLE_API_KEY"]
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-1.5-flash")
-    api_funcional = True
+    api_ready = True
 except Exception as e:
-    st.error("⚠️ Error: No se encontró 'GOOGLE_API_KEY' en los Secrets de Streamlit.")
-    api_funcional = False
+    st.error("⚠️ Configuración incompleta: Asegúrate de que 'GOOGLE_API_KEY' esté en los Secrets de Streamlit.")
+    api_ready = False
 
-# --- ÁREA DE TRABAJO ---
-tema = st.text_input("🎯 Tema para el folioscopio:", placeholder="Ej: Gestión del tiempo para madres")
+# --- INTERFAZ DE USUARIO ---
+tema = st.text_input("🎯 ¿Qué estrategia visual creamos hoy?", placeholder="Ej: Pasos para el ahorro de emergencia")
+formato = st.radio("Elige la experiencia:", ["Carrusel (Manual)", "Folioscopio (Automático)"], horizontal=True)
 
-if st.button("🚀 GENERAR FOLIOSCOPIO"):
-    if tema and api_funcional:
-        with st.status("🧠 Diseñando secuencia visual...", expanded=True) as status:
+if st.button("🚀 GENERAR SECUENCIA VISUAL"):
+    if tema and api_ready:
+        with st.status("🧠 La IA está diseñando tu secuencia...", expanded=True) as status:
             try:
-                prompt = f"Crea 5 frases cortas y potentes sobre '{tema}' para un carrusel. Usa el Método CEO. Formato: Frase | PalabraClaveImagen. Dame 5 líneas."
+                # Prompt optimizado para el folioscopio
+                prompt = f"""
+                Eres un director creativo para 'Grandes Protagonistas'. Crea 5 escenas para un folioscopio sobre '{tema}'.
+                Sigue el Método CEO. Cada escena debe ser impactante.
+                Formato de respuesta (5 líneas exactamente):
+                Texto de la escena | Palabra clave para imagen
+                """
                 response = model.generate_content(prompt)
-                lineas = response.text.strip().split('\n')
+                escenas = response.text.strip().split('\n')
                 
-                placeholder = st.empty()
-                for linea in lineas:
-                    if "|" in linea:
-                        partes = linea.split("|")
-                        texto = partes[0].strip()
-                        keyword = partes[1].strip()
-                        img_url = f"https://source.unsplash.com/featured/?{keyword},minimal"
-                        
-                        placeholder.markdown(f"""
-                            <div class="folio-page">
-                                <img src="{img_url}" style="width: 300px; border-radius: 15px;">
-                                <div class="folio-text">{texto}</div>
+                # Procesar datos
+                data_final = []
+                for esc in escenas:
+                    if "|" in esc:
+                        t, k = esc.split("|")
+                        # Usamos imágenes de alta calidad de Source Unsplash
+                        url = f"https://images.unsplash.com/photo-1554224155-1696413575b9?auto=format&fit=crop&q=80&w=400" if "ahorro" in tema.lower() else f"https://source.unsplash.com/featured/400x400?{k.strip()},business,minimal"
+                        data_final.append({"texto": t.strip(), "img": url})
+
+                status.update(label="✅ Contenido Creado", state="complete")
+
+                # --- RENDERIZADO ---
+                if formato == "Carrusel (Manual)":
+                    tabs = st.tabs([f"E{i+1}" for i in range(len(data_final))])
+                    for i, tab in enumerate(tabs):
+                        with tab:
+                            st.markdown(f"""
+                                <div class="folio-card">
+                                    <div class="folio-sub">Escena {i+1} de 5</div>
+                                    <img src="{data_final[i]['img']}" style="width: 320px; border-radius: 20px;">
+                                    <div class="folio-text">{data_final[i]['texto']}</div>
+                                </div>
+                            """, unsafe_allow_html=True)
+                else:
+                    # Folioscopio Automático
+                    visor = st.empty()
+                    for i, esc in enumerate(data_final):
+                        visor.markdown(f"""
+                            <div class="folio-card">
+                                <div class="folio-sub">Paso {i+1} de 5</div>
+                                <img src="{esc['img']}" style="width: 320px; border-radius: 20px;">
+                                <div class="folio-text">{esc['texto']}</div>
                             </div>
                         """, unsafe_allow_html=True)
-                        time.sleep(3.5)
+                        time.sleep(3.5) # Tiempo de "vuelta de hoja"
                 
-                status.update(label="✅ Folioscopio Completado", state="complete")
+                st.success("🏁 ¡Secuencia lista para grabar o presentar!")
+
             except Exception as e:
-                st.error(f"Error en la generación: {e}")
+                st.error(f"Hubo un pequeño tropiezo: {e}")
+    else:
+        st.warning("Escribe un tema antes de empezar.")
