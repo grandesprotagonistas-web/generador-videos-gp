@@ -27,7 +27,7 @@ st.markdown("""
 col1, col2 = st.columns([1, 4])
 with col1:
     try:
-        st.image("logo_gp.png", width=90)
+        st.image("logo gp final al agua.jpg", width=90)
     except:
         st.warning("Logo no encontrado. Sube logo_gp.png a GitHub.")
 with col2:
